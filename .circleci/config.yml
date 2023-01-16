@@ -11,7 +11,7 @@ workflows:
           name: check-updated-files
           mapping: |
             infrastructure/.* infrastructure true
-            app/.* image true
+            app/.* image-create true
           config-path: .circleci/continue_config.yml
 
 
