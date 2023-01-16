@@ -17,7 +17,7 @@ resource "aws_security_group" "service_sg" {
 }
 
 resource "aws_security_group" "db-sg" {
-  vpc_id = aws_vpc.aws-vpc.id
+  vpc_id = aws_vpc.db-vpc.id
 
   ingress {
     from_port       = 0
