@@ -4,7 +4,7 @@ parameters:
   infrastructure:
     type: boolean
     default: false
-  image:
+  image-create:
     type: boolean
     default: false
 
@@ -74,7 +74,7 @@ workflows:
     jobs:
       - create-infrastructure
   application-setup:
-    when: << pipeline.parameters.image >>
+    when: << pipeline.parameters.image-create >>
     jobs:
       - test-infrastructure
       - build-push:
