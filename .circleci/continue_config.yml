@@ -9,7 +9,7 @@ parameters:
     default: false
 
 jobs:
-  create_infrastructure:
+  create-infrastructure:
     docker:
       - image: cimg/aws:2022.11
     steps:
@@ -24,7 +24,7 @@ jobs:
           terraform apply -auto-approve
           aws s3 cp ./private_ip.txt s3://${STATE_BUCKET}/
 
-  test_infrastructure:
+  test-infrastructure:
     docker:
       - image: cimg/aws:2022.11
     steps:
@@ -33,7 +33,7 @@ jobs:
           aws ecs describe-clusters --cluster $TF_VAR_cluster_name > cluster.json
           if grep -q '"status": "ACTIVE"' cluster.json; then exit 0; else exit 1; fi
 
-  build_and_push:
+  build-push:
     machine:
       image: ubuntu-2204:2022.04.2
     steps:
@@ -47,7 +47,7 @@ jobs:
           aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 841962000336.dkr.ecr.us-east-1.amazonaws.com
           sudo docker push ${TF_VAR_ecr_repo}:latest .
 
-  image_test:
+  image-test:
     machine:
       image: ubuntu-2204:2022.04.2
     steps:
@@ -69,24 +69,24 @@ jobs:
           aws ecs update-service --cluster $TF_VAR_cluster_name --service $TF_VAR_service_name --force-new-deployment
 
 workflows:
-  infrastructure_deploy:
+  infrastructure-deploy:
     when: << pipeline.parameters.infrastructure >>
     jobs:
-      - create_infrastructure
-  application_setup:
+      - create-infrastructure
+  application-setup:
     when: << pipeline.parameters.image >>
     jobs:
-      - test_infrastructure
-      - build_and_push:
+      - test-infrastructure
+      - build-push:
           requires:
-            - test_infrastructure
-      - image_test:
+            - test-infrastructure
+      - image-test:
           requires:
-            - build_and_push
-      - hold_deploy:
+            - build-push
+      - hold-deploy:
           type: approval
           requires:
-            - image_test
+            - image-test
       - deploy:
           requires:
-            - hold_deploy  
+            - hold-deploy  
