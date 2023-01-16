@@ -26,6 +26,7 @@ jobs:
             sudo apt update && sudo apt install -y terraform
             terraform init -backend=true -backend-config="bucket=$STATE_BUCKET" -backend-config="key=terraform.tfstate" -backend-config="region=$REGION"
             terraform apply -auto-approve
+            terraform output -raw rds_url > private_ip.txt
             aws s3 cp ./private_ip.txt s3://${STATE_BUCKET}/
 
   - test_infrastructure:
