@@ -12,7 +12,6 @@ workflows:
           mapping: |
             infrastructure/.* infrastructure true
             app/.* image true
-          base-revision: main
           config-path: .circleci/continue_config.yml
 
 
