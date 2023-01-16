@@ -1,9 +1,5 @@
 version: 2.1
 
-orbs:
-  aws-ecr: circleci/aws-ecr@8.2.1
-  aws-ecs: circleci/aws-ecs@1.2.0
-
 parameters:
   infrastructure:
     type: boolean
@@ -74,27 +70,27 @@ jobs:
             aws ecs update-service --cluster $TF_VAR_cluster_name --service $TF_VAR_service_name --force-new-deployment
 
 workflows:
-  infrastructure_deploy:
-    when: << pipeline.parameters.infrastructure >>
-    jobs:
-      - create_infrastructure
-  application_setup:
-    when: << pipeline.parameters.image >>
-    jobs:
-      - test_infrastructure
-      - build_and_push:
-          requires:
-            - test_infrastructure
-      - image_test:
-          requires:
-            - build_and_push
-      - hold_deploy:
-          type: approval
-          requires:
-            - image_test
-      - deploy:
-          requires:
-            - hold_deploy  
+  - infrastructure_deploy:
+      when: << pipeline.parameters.infrastructure >>
+      jobs:
+        - create_infrastructure
+  - application_setup:
+      when: << pipeline.parameters.image >>
+      jobs:
+        - test_infrastructure
+        - build_and_push:
+            requires:
+              - test_infrastructure
+        - image_test:
+            requires:
+              - build_and_push
+        - hold_deploy:
+            type: approval
+            requires:
+              - image_test
+        - deploy:
+            requires:
+              - hold_deploy  
 
 
 
