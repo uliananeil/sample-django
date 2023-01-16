@@ -1,9 +1,9 @@
 resource "aws_alb" "application_load_balancer" {
-  name               = "django-app-alb"
+  name               = "django-alb"
   internal           = false
   load_balancer_type = "application"
-  subnets            = [aws_subnet.public.id, aws_subnet.public_2.id]
-  security_groups    = [aws_security_group.load_balancer_security_group.id]
+  subnets            = [aws_subnet.http-1.id, aws_subnet.http-2.id]
+  security_groups    = [aws_security_group.lb-sg.id]
 
   tags = {
     Name        = "django-app-alb"
