@@ -5,11 +5,11 @@ resource "aws_ecs_cluster" "aws-ecs-cluster" {
 resource "aws_ecs_task_definition" "aws-ecs-task" {
   family = "django-family"
 
-  container_definitions = <<DEFINITION
+  container_definitions = <<TASK_DEFINITION
   [
     {
       "name": "django-app",
-      "image": "${var.ecr_repo}:latest",
+      "image": "841962000336.dkr.ecr.us-east-1.amazonaws.com/django-repo:latest",
       "entryPoint": [],
       "essential": true,
       "portMappings": [
@@ -23,7 +23,7 @@ resource "aws_ecs_task_definition" "aws-ecs-task" {
       "networkMode": "awsvpc"
     }
   ]
-  DEFINITION
+  TASK_DEFINITION
 
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
@@ -34,9 +34,6 @@ resource "aws_ecs_task_definition" "aws-ecs-task" {
 
 }
 
-data "aws_ecs_task_definition" "main" {
-  task_definition = aws_ecs_task_definition.aws-ecs-task.family
-}
 
 resource "aws_ecs_service" "aws-ecs-service" {
   name                 = var.service_name

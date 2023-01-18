@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  terraform: circleci/terraform@3.1
+
 parameters:
   infrastructure:
     type: boolean
@@ -10,84 +13,88 @@ parameters:
 
 jobs:
   create-infrastructure:
-    docker:
-      - image: cimg/aws:2022.11
+    executor: terraform/default
     steps:
       - checkout
       - run: |
-          ls
-          sudo chmod +x script.sh
-          ./script.sh
-          cd infrastructure
-          wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
-          echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-          sudo apt update && sudo apt install -y terraform
-          terraform init -backend=true -backend-config="bucket=$STATE_BUCKET" -backend-config="key=terraform.tfstate" -backend-config="region=$REGION"
+          cd infrastructure/
+          terraform init -backend-config="bucket=$STATE_BUCKET" -backend-config="key=terraform.tfstate" -backend-config="region=$REGION"
           terraform apply -auto-approve
-          aws s3 cp ./private_ip.txt s3://${STATE_BUCKET}/
+          terraform output -raw rds_url > db_ip.txt
+          aws s3 cp ./db_ip.txt s3://${STATE_BUCKET}/
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .
 
-  test-infrastructure:
+  destroy-infrastrucutre:
+    executor: terraform/default
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - terraform/destroy:
+          path: infrastructure/
+
+
+  test-cluster:
     docker:
       - image: cimg/aws:2022.11
     steps:
       - run: |
-          ./script.sh
           aws ecs describe-clusters --cluster $TF_VAR_cluster_name > cluster.json
           if grep -q '"status": "ACTIVE"' cluster.json; then exit 0; else exit 1; fi
 
-  build-push:
-    machine:
-      image: ubuntu-2204:2022.04.2
+  build-and-push-image:
+    docker:
+      - image: cimg/aws:2022.11
     steps:
-      - checkout
       - run: |
-          cd app
-          aws s3 cp s3://${STATE_BUCKET}/private_ip.txt ./
-          sed -i "s/<PRIVATE_IP>/$(cat private_ip.txt)/g" Dockerfile
-          sed -i "s/<PASS>/$TF_VAR_rds_pass/g" Dockerfile
-          sudo docker build -t ${TF_VAR_ecr_repo}:latest .
-          aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 841962000336.dkr.ecr.us-east-1.amazonaws.com
-          sudo docker push ${TF_VAR_ecr_repo}:latest .
+          cd app/
+          aws s3 cp s3://${STATE_BUCKET}/db_ip.txt .
+          sed -i "s/<DB_IP>/$(cat db_ip.txt)/g" Dockerfile
+          docker build -t django-app .
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
+          docker tag django-app:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
+          docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
 
-  image-test:
-    machine:
-      image: ubuntu-2204:2022.04.2
+  dive-test:
+    docker:
+      - image: cimg/aws:2022.11
     steps:
-      - checkout
       - run: |
-          ./script.sh
           sudo wget https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.deb
           sudo apt install ./dive_0.9.2_linux_amd64.deb
-          aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 841962000336.dkr.ecr.us-east-1.amazonaws.com
-          sudo dive --ci ${TF_VAR_ecr_repo}:latest
-  deploy:
-    machine:
-      image: ubuntu-2204:2022.04.2
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
+          sudo dive --ci ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}:latest
+
+  deploy-image:
+    docker:
+      - image: cimg/aws:2022.11
     steps:
-      - checkout
       - run: |
-          ./script.sh
           aws ecs update-service --cluster $TF_VAR_cluster_name --service $TF_VAR_service_name --force-new-deployment
 
 workflows:
-  infrastructure-deploy:
+  infrastructure:
     when: << pipeline.parameters.infrastructure >>
     jobs:
       - create-infrastructure
-  application-setup:
+      - hold-destroy:
+          type: approval
+          requires: create-infrastructure
+      - destroy-infrastructre:
+          requires: hold-destroy
+  app:
     when: << pipeline.parameters.image-create >>
     jobs:
-      - test-infrastructure
-      - build-push:
+      - test-cluster
+      - build-and-push-image:
           requires:
-            - test-infrastructure
-      - image-test:
+            - test-cluster
+      - dive-test:
           requires:
-            - build-push
-      - hold-deploy:
-          type: approval
-          requires:
-            - image-test
+            - build-and-push-image
       - deploy:
           requires:
-            - hold-deploy  
+            - dive-test
