@@ -27,7 +27,7 @@ jobs:
           paths:
             - .
 
-  destroy-infrastrucutre:
+  destroy-infrastructure:
     executor: terraform/default
     steps:
       - checkout
@@ -83,7 +83,7 @@ workflows:
       - hold-destroy:
           type: approval
           requires: create-infrastructure
-      - destroy-infrastructre:
+      - destroy-infrastructure:
           requires: hold-destroy
   app-deploy:
     when: << pipeline.parameters.image-create >>
