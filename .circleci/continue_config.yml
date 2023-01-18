@@ -76,7 +76,7 @@ jobs:
           aws ecs update-service --cluster $TF_VAR_cluster_name --service $TF_VAR_service_name --force-new-deployment
 
 workflows:
-  infrastructure:
+  infrastructure-deploy:
     when: << pipeline.parameters.infrastructure >>
     jobs:
       - create-infrastructure
@@ -85,7 +85,7 @@ workflows:
           requires: create-infrastructure
       - destroy-infrastructre:
           requires: hold-destroy
-  app:
+  app-deploy:
     when: << pipeline.parameters.image-create >>
     jobs:
       - test-cluster
