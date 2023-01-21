@@ -57,7 +57,7 @@ jobs:
       - run: >
           
           aws s3 cp s3://${STATE_BUCKET}/db_ip.txt .
-
+          ls
           sed -i "s/<DB_IP>/$(cat db_ip.txt)/g" ./app/Dockerfile
 
           docker build -t django-app ./app/
