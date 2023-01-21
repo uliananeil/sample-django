@@ -55,16 +55,14 @@ jobs:
       - image: cimg/aws:2022.11
     steps:
       - run: >
-          ls
-          cd app/
-
+          
           aws s3 cp s3://${STATE_BUCKET}/db_ip.txt .
 
           sed -i "s/<DB_IP>/$(cat db_ip.txt)/g" Dockerfile
 
-          docker build -t django-app .
+          docker build -t django-app ./app/
 
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
+          aws ecr get-login-password --region $TF_VAR_region | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
 
           docker tag django-app:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
 
