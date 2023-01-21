@@ -22,11 +22,20 @@ jobs:
 
           terraform output -raw rds_url > db_ip.txt
 
-          aws s3 cp ./db_ip.txt s3://${STATE_BUCKET}/
       - persist_to_workspace:
           root: .
           paths:
             - .
+  store-rds-ip:
+    docker:
+      - image: cimg/aws:2022.11
+    steps:
+      - attach_workspace:
+          at: .
+      - run: >
+          cd infrastructure/
+          ls
+          aws s3 cp ./db_ip.txt s3://${STATE_BUCKET}/
   destroy-infrastructure:
     executor: terraform/default
     steps:
@@ -86,6 +95,9 @@ workflows:
     when: << pipeline.parameters.infrastructure >>
     jobs:
       - create-infrastructure
+      - store-rds-ip:
+          requires:
+            - create-infrastructure
       - hold-destroy:
           type: approval
           requires: 
