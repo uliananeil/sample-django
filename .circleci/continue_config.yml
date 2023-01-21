@@ -47,7 +47,7 @@ jobs:
       - image: cimg/aws:2022.11
     steps:
       - run: >
-          aws ecs describe-clusters --cluster $TF_VAR_cluster_name > cluster.json
+          aws ecs describe-clusters --cluster $TF_VAR_cluster_name --region $TF_VAR_region > cluster.json
 
           if grep -q '"status": "ACTIVE"' cluster.json; then exit 0; else exit 1; fi
   build-and-push-image:
