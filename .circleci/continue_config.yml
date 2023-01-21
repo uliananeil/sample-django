@@ -103,6 +103,6 @@ workflows:
       - dive-test:
           requires:
             - build-and-push-image
-      - deploy:
+      - deploy-image:
           requires:
             - dive-test
