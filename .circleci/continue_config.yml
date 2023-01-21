@@ -91,7 +91,8 @@ workflows:
           requires: 
             - create-infrastructure
       - destroy-infrastructure:
-          requires: hold-destroy
+          requires: 
+            - hold-destroy
   app-deploy:
     when: << pipeline.parameters.image-create >>
     jobs:
