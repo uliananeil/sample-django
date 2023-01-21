@@ -56,12 +56,14 @@ jobs:
     steps:
       - checkout
       - run: >
+          sudo wget
+          https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.deb
+          sudo apt install ./dive_0.9.2_linux_amd64.deb
+
           
           aws s3 cp s3://${STATE_BUCKET}/db_ip.txt .
-
           sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" ./app/Dockerfile
-
-          docker build -t django-app ./app/
+          dive build -t django-app ./app/
 
           aws ecr get-login-password --region $TF_VAR_region | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
 
