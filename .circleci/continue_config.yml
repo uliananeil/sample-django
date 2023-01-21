@@ -33,8 +33,7 @@ jobs:
       - attach_workspace:
           at: .
       - run: >
-          ls
-          aws s3 cp infrastructure/db_ip.txt s3://${STATE_BUCKET}/
+          aws s3 cp ./infrastructure/db_ip.txt s3://${STATE_BUCKET}/
   destroy-infrastructure:
     executor: terraform/default
     steps:
