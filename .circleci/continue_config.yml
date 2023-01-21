@@ -55,6 +55,7 @@ jobs:
       - image: cimg/aws:2022.11
     steps:
       - run: >
+          ls
           cd app/
 
           aws s3 cp s3://${STATE_BUCKET}/db_ip.txt .
