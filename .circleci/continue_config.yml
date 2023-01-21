@@ -88,7 +88,8 @@ workflows:
       - create-infrastructure
       - hold-destroy:
           type: approval
-          requires: create-infrastructure
+          requires: 
+            - create-infrastructure
       - destroy-infrastructure:
           requires: hold-destroy
   app-deploy:
