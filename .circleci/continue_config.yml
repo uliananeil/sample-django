@@ -33,7 +33,6 @@ jobs:
       - attach_workspace:
           at: .
       - run: >
-          cd infrastructure/
           ls
           aws s3 cp ./db_ip.txt s3://${STATE_BUCKET}/
   destroy-infrastructure:
