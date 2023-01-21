@@ -1,5 +1,5 @@
 resource "aws_db_instance" "rds" {
-  allocated_storage      = 3
+  allocated_storage      = 5
   db_name                = "djangodb"
   engine                 = "postgres"
   instance_class         = "db.t3.micro"
