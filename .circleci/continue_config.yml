@@ -2,6 +2,7 @@ version: 2.1
 orbs:
   terraform: circleci/terraform@3.1
   aws-cli: circleci/aws-cli@3.1
+  docker: circleci/docker@2.2.0
 
 parameters:
   infrastructure:
@@ -43,6 +44,7 @@ jobs:
       - checkout
       - run: >
           aws ecs describe-clusters --cluster $TF_VAR_cluster_name --region $TF_VAR_region  --query 'clusters[*].[status]' --output text > status.txt
+          grep --help
           
 
   build-and-push-image:
@@ -51,7 +53,7 @@ jobs:
     steps:
       - checkout
       - run: >
-          aws rds describe-db-instances --region $TF_VAR_region --query 'DBInstances[*].[Endpoint.Address]' --filters Name=db-instance-id,Values='rds' --output text > db_ip.txt
+          aws rds describe-db-instances --region $TF_VAR_region --query 'DBInstances[*].[Endpoint.Address]' --output text > db_ip.txt
 
           sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" ./app/Dockerfile
           docker build --help
