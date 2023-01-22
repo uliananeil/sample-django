@@ -111,6 +111,7 @@ workflows:
           requires:
             - build-and-push-image
       - hold-deploy: 
+          type: approval
           requires:
             - dive-test
       - deploy-image:
