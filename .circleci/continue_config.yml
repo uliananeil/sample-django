@@ -37,7 +37,8 @@ jobs:
           path: infrastructure/
 
   test-cluster:
-    executor: aws-cli/default
+    docker:
+      - image: cimg/aws:2022.11
     steps:
       - run: >
           aws ecs describe-clusters --cluster $TF_VAR_cluster_name --region $TF_VAR_region  --query 'clusters[*].[status]' --output text > status.txt
