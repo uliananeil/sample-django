@@ -37,7 +37,7 @@ jobs:
           path: infrastructure/
 
   test-cluster:
-    docker:
+    machine:
       - image: amazon/aws-cli
     steps:
       - checkout
