@@ -41,7 +41,7 @@ jobs:
     steps:
       - run: >
           aws ecs describe-clusters --cluster $TF_VAR_cluster_name --region $TF_VAR_region  --query 'clusters[*].[status]' --output text > status.txt
-          if grep -q 'INACTIVE' status.txt; then exit 1; else exit 0; fi
+          if grep -q 'INACTIVE' status.txt then exit 1 else exit 0 fi
 
   build-and-push-image:
     docker:
