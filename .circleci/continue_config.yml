@@ -56,8 +56,10 @@ jobs:
           aws rds describe-db-instances --region $TF_VAR_region --query 'DBInstances[*].[Endpoint.Address]' --output text > db_ip.txt
 
           sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" app/Dockerfile
+      - run: cd app/
       - run: |
           docker build -t django-app app/Dockerfile
+      - run: |
 
           aws ecr get-login-password --region $TF_VAR_region | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
 
