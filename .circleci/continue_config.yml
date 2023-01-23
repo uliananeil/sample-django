@@ -58,7 +58,7 @@ jobs:
           sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" app/Dockerfile
       - run: ls app/
       - run: pwd
-      - run: docker build -t django-app -f app/Dockerfile
+      - run: docker build -t django-app -f app/Dockerfile .
       - run: |
 
           aws ecr get-login-password --region $TF_VAR_region | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
