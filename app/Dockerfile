@@ -3,7 +3,7 @@ RUN apk update && apk add build-base
 
 
 WORKDIR /source
-COPY requirements.txt /source/
+COPY . /source/
 RUN python3 -m ensurepip --upgrade && \
 python3 -m pip install -r /source/requirements.txt
 
