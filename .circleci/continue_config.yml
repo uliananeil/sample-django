@@ -49,7 +49,7 @@ jobs:
 
   build-and-push-image:
     docker:
-      - image: ubuntu-2004:202101-01
+      - image: ubuntu
     steps:
       - checkout
       - run: sudo service docker status
