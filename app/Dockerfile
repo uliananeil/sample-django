@@ -15,7 +15,8 @@ RUN apk add libpq
 COPY --from=base /usr/local/lib/python3.9/site-packages/ /usr/local/lib/python3.9/site-packages/
 COPY --from=base /usr/local/bin/ /usr/local/bin/
 COPY . /app
-RUN rm -r /usr/local/lib/python3.9/site-packages/pip /usr/local/lib/python3.9/site-packages/setuptools
+RUN rm -r /usr/local/lib/python3.9/site-packages/pip/ \
+    rm -r /usr/local/lib/python3.9/site-packages/setuptools
 EXPOSE 8000
 RUN python /app/manage.py migrate 
 CMD gunicorn --bind 0.0.0.0:8000 --worker-tmp-dir /dev/shm mysite.wsgi
