@@ -42,10 +42,9 @@ jobs:
       - image: cimg/aws:2022.11
     steps:
       - checkout
-      - run: >
+      - run: |
           aws ecs describe-clusters --cluster $TF_VAR_cluster_name --region $TF_VAR_region  --query 'clusters[*].[status]' --output text > status.txt
-          grep --help
-          
+          if [[ $(< status.txt) = "ACTIVE" ]] ; then exit 0; else exit 1; fi
 
   build-and-push-image:
     machine:
@@ -73,23 +72,15 @@ jobs:
       - attach_workspace:
           at: .
       - run: |
-          sudo wget
-          https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.deb
+          sudo wget https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.deb
           sudo apt install ./dive_0.9.2_linux_amd64.deb
           sudo dive --ci ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}:latest
-      - persist_to_workspace:
-          root: .
-          paths:
-            - .
 
   deploy-image:
     executor: aws-cli/default
     steps:
-      - attach_workspace:
-          at: .
       - run: |
-          aws ecs update-service --cluster $TF_VAR_cluster_name --service
-          $TF_VAR_service_name --force-new-deployment
+          aws ecs update-service --cluster $TF_VAR_cluster_name --service $TF_VAR_service_name --force-new-deployment
 
 workflows:
   infrastructure-deploy:
