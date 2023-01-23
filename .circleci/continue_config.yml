@@ -58,7 +58,7 @@ jobs:
           sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" app/Dockerfile
 
       - run: |
-          sudo apt-get install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+          sudo apt-get install docker-ce docker-ce-cli containerd.io
           aws ecr get-login-password --region $TF_VAR_region | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
           sudo docker build -t django-app -f app/Dockerfile .
           sudo docker tag django-app:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
