@@ -48,8 +48,8 @@ jobs:
           
 
   build-and-push-image:
-    docker:
-      - image: cimg/aws:2022.11
+    machine:
+      - image: ubuntu-2004:202010-01
         auth:
           username: uliananeil
           password: $DOCKERHUB_PASSWORD
