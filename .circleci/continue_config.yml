@@ -58,8 +58,8 @@ jobs:
           sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" app/Dockerfile
 
       - run: |
-          sudo system daemon-reload
-          sudo systemctl docker
+          sudo service daemon-reload
+          sudo service docker start
           aws ecr get-login-password --region $TF_VAR_region | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
           sudo docker build -t django-app -f app/Dockerfile .
           sudo docker tag django-app:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
