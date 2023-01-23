@@ -52,7 +52,7 @@ jobs:
       - image: ubuntu
     steps:
       - checkout
-      - run: service docker status
+      - run: docker --version
       - run: |
           aws rds describe-db-instances --region $TF_VAR_region --query 'DBInstances[*].[Endpoint.Address]' --output text > db_ip.txt
 
