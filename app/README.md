@@ -81,6 +81,5 @@ This will delete the app and destroy any underlying DigitalOcean resources
 **Note: If you don't delete your app, charges for the use of DigitalOcean services will continue to accrue.**
 
 test test test
-te
 test test test
 testtesjlktestnngghgtestfd
