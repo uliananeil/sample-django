@@ -16,7 +16,7 @@ jobs:
     executor: terraform/default
     steps:
       - checkout
-      - run: >
+      - run: |
           cd infrastructure/
 
           terraform init -backend-config="bucket=$STATE_BUCKET" -backend-config="key=terraform.tfstate" -backend-config="region=$REGION"
@@ -58,7 +58,7 @@ jobs:
           sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" app/Dockerfile
       - run: cd app/
       - run: |
-          docker build -t django-app app/Dockerfile
+          docker build -t django-app .
       - run: |
 
           aws ecr get-login-password --region $TF_VAR_region | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
@@ -75,7 +75,7 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run: >
+      - run: |
           sudo wget
           https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.deb
           sudo apt install ./dive_0.9.2_linux_amd64.deb
@@ -90,7 +90,7 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run: >
+      - run: |
           aws ecs update-service --cluster $TF_VAR_cluster_name --service
           $TF_VAR_service_name --force-new-deployment
 
