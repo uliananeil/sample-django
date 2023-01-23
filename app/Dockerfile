@@ -16,5 +16,5 @@ COPY --from=base /usr/local/lib/python3.9/site-packages/ /usr/local/lib/python3.
 COPY --from=base /usr/local/bin/ /usr/local/bin/
 COPY . /app
 EXPOSE 8000
-RUN python manage.py migrate 
+RUN python /app/manage.py migrate 
 CMD gunicorn --bind 0.0.0.0:8000 --worker-tmp-dir /dev/shm mysite.wsgi
