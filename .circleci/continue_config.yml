@@ -73,7 +73,8 @@ jobs:
       - run: |
           sudo wget https://github.com/wagoodman/dive/releases/download/v0.9.2/dive_0.9.2_linux_amd64.deb
           sudo apt install ./dive_0.9.2_linux_amd64.deb
-          sudo dive --ci django-app:latest
+          aws ecr get-login-password --region $TF_VAR_region | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
+          sudo dive --ci ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
 
   deploy-image:
     executor: aws-cli/default
