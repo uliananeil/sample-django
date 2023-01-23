@@ -48,8 +48,7 @@ jobs:
           
 
   build-and-push-image:
-    machine:
-      image: ubuntu-2004:202101-01
+    executor: docker/default
     steps:
       - checkout
       - docker/check
