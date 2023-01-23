@@ -50,9 +50,6 @@ jobs:
   build-and-push-image:
     machine:
       - image: ubuntu-2004:202010-01
-        auth:
-          username: uliananeil
-          password: $DOCKERHUB_PASSWORD
     steps:
         
       - checkout
