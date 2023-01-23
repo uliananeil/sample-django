@@ -58,7 +58,6 @@ jobs:
           sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" app/Dockerfile
 
       - run: |
-          sudo groupadd docker
           sudo usermod -aG docker $USER
           newgrp docker
           gpasswd -a $USER docker
