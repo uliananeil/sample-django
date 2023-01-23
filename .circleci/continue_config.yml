@@ -70,6 +70,10 @@ jobs:
           apt-get update
           apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
       - run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install
+      - run: |
           aws rds describe-db-instances --region $TF_VAR_region --query 'DBInstances[*].[Endpoint.Address]' --output text > db_ip.txt
 
           sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" app/Dockerfile
