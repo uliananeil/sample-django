@@ -57,6 +57,7 @@ jobs:
 
           sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" app/Dockerfile
       - run: cd app/
+      - run: ls
       - run: |
           docker build -t django-app .
       - run: |
