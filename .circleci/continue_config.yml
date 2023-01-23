@@ -59,7 +59,8 @@ jobs:
       - run: cd app/
       - run: ls
       - run: |
-          docker build -t django-app .
+          cat Dockerfile
+          docker build -t django-app Dockerfile
       - run: |
 
           aws ecr get-login-password --region $TF_VAR_region | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
