@@ -49,12 +49,9 @@ jobs:
 
   build-and-push-image:
     machine:
-      - image: ubuntu-2004:202010-01
+      image: ubuntu-2004:202010-01
     steps:
-        
       - checkout
-
-
       - run: |
           aws rds describe-db-instances --region $TF_VAR_region --query 'DBInstances[*].[Endpoint.Address]' --output text > db_ip.txt
 
