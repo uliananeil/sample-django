@@ -7,7 +7,7 @@ RUN pip install -r requirements.txt
 
 FROM python:3.9-alpine
 ENV DJANGO_ALLOWED_HOSTS=*
-ENV DATABASE_URL="postgres://postgres:password123@<DB_IP>:5432/djangobd"
+ENV DATABASE_URL="postgres://postgres:password123@<DB_IP>:5432/djangodb"
 COPY --from=base /code/ /code
 COPY --from=base /usr/local/lib/python3.9 /usr/local/lib/python3.9
 COPY --from=base /usr/local/bin/gunicorn /usr/local/bin/gunicorn
