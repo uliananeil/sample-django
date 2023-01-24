@@ -17,6 +17,5 @@ RUN pip install \
         -f /wheels \
     && rm -rf /wheels
 EXPOSE 8000
-RUN ls
 RUN python manage.py migrate 
 CMD gunicorn --bind 0.0.0.0:8000 --worker-tmp-dir /dev/shm mysite.wsgi
