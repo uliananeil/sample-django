@@ -30,5 +30,7 @@ You need to add environment variables in CircleCI:
 - TF_VAR_rds_passwd
 - TF_VAR_cluster_name
 - TF_VAR_service_name
+- TF_VAR_rds_user
+- TF_VAR_rds_db
 
 

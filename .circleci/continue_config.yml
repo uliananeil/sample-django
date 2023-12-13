@@ -53,11 +53,10 @@ jobs:
       - checkout
       - run: |
           aws rds describe-db-instances --region $TF_VAR_region --query 'DBInstances[*].[Endpoint.Address]' --output text > db_ip.txt
-      - run: sed -i "s/<DB_IP>/$(cat ./db_ip.txt)/g" app/Dockerfile
       - run: |
           aws ecr get-login-password --region $TF_VAR_region | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
           cd app/
-          docker build -t django-app .
+          docker build --build-arg POSTGRES_USER=$TF_VAR_rds_user --build-arg POSTGRES_PASSWORD=$TF_VAR_rds_passwd --build-arg POSTGRES_DB=$TF_VAR_rds_db --build-arg DB_IP=$(cat ../db_ip.txt) -t django-app .
           docker images
           docker tag django-app:latest ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
           docker push ${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com/${TF_VAR_ecr_repo}
